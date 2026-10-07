@@ -1,77 +1,37 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-from .base_grafica import BaseGrafico
-from schemas.schemas import MensajeroExtractorSchema, InfoTecnicaSchema
+import itertools
+from graficadores.base_grafica import BaseGrafico
+from schemas.schemas import PeticionSerieTemporal
 
 class SerieTemporalGrafico(BaseGrafico):
-    
-    def _procesamiento_datos(self, fechas: list, datos_brutos: list, operaciones: list) -> pd.DataFrame:
-        """
-        Convierte las listas del mensajero en un DataFrame de Pandas
-        y calcula las reducciones temporales y estadísticas solicitadas.
-        """
-        # Se crea el DataFrame base con indice de tiempo
-        df = pd.DataFrame({"valor": datos_brutos}, index=pd.to_datetime(fechas))
-        df_resultados = pd.DataFrame(index=df.index)
-        
-        # Se ejecutan las operaciones solicitadas por el usuario
-        if "datos_brutos" in operaciones:
-            df_resultados["Datos Brutos"] = df["valor"]
-            
-        if "promedio_diario" in operaciones:
-            df_resultados["Promedio Diario"] = df["valor"].resample("D").transform("mean")
-            
-        if "promedio_mensual" in operaciones:
-            df_resultados["Promedio Mensual"] = df["valor"].resample("ME").transform("mean")
-            
-        if "promedio_anual" in operaciones:
-            df_resultados["Promedio Anual"] = df["valor"].resample("YE").transform("mean")
-            
-        if "maximos" in operaciones:
-            df_resultados["Máximos"] = df["valor"].cummax() # O resample si es por bloques
-            
-        if "minimos" in operaciones:
-            df_resultados["Mínimos"] = df["valor"].cummin()
 
-        # Si el usuario no pidio operaciones validas, devolvemos al menos el bruto
-        if df_resultados.empty:
-            df_resultados["Datos"] = df["valor"]
-            
-        return df_resultados
-
-    def plot(self, ax, mensajero: MensajeroExtractorSchema) -> None:
+    def plot(self, ax: plt.Axes, peticion: PeticionSerieTemporal) -> None:
         """
-        Bloque de Dibujo: Implementa obligatoriamente el metodo abstracto de BaseGrafico.
+        Bloque de Dibujo: Implementa el BaseGrafico.
         """
 
-        df_lineas = self._procesamiento_datos(
-            mensajero.fechas,
-            mensajero.datos_brutos,
-            mensajero.config_usuario.operaciones)
-        
-        # Se itera sobre las columnas calculadas y graficarlas
-        for columna in df_lineas.columns:
+        fechas_dt = pd.to_datetime(peticion.fechas)
+       
+        colores_disponibles = plt.rcParams['axes.prop_cycle'].by_key()['color']
+        ciclo_colores = itertools.cycle(colores_disponibles)
+            
+        for nombre_variable, valores in peticion.datos.items():
+            
             ax.plot(
-                df_lineas.index, 
-                df_lineas[columna], 
-                label=f"{columna} ({mensajero.info_tecnica.unidades_dataset})"
+                fechas_dt, 
+                valores, 
+                label=nombre_variable,
+                linewidth=1.5,
+                color=next(ciclo_colores)
             )
-            
-        # Anotacion cientifica extra opcional en el lienzo (ej. coordenadas reales)
-        ax.text(
-            0.02, 0.02, 
-            f"Lat real: {mensajero.info_tecnica.lat_real:.3f} | Lon real: {mensajero.info_tecnica.lon_real:.3f}",
-            transform=ax.transAxes, 
-            fontsize=8, 
-            bbox=dict(boxstyle="round,pad=0.3", fc="#F0F0F0", edgecolor="#DAD9D8", alpha=0.8)
-        )
 
+        ax.tick_params(axis='x', rotation=45)
 
-def dibujar(mensajero: MensajeroExtractorSchema) -> str:
+def dibujar(peticion: PeticionSerieTemporal) -> str:
     """
    Funcion de enrutamiento para main.py
     """
 
-    graficador = SerieTemporalGrafico(estilo=mensajero.config_usuario.estetica)    
-    return graficador.render(mensajero)
+    graficador = SerieTemporalGrafico(estilo=peticion.estetica)    
+    return graficador.render(peticion)
