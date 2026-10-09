@@ -5,6 +5,9 @@ from schemas.schemas import EsteticaSchema
 from utils.estilo import aplicar_estilo, roles_tipograficos, aplicar_marca_agua, marca_agua_localizada, marca_agua_malla
 
 class BaseGrafico(ABC):
+    PROYECCION = None                  # 'polar' u otra proyeccion; None = cartesiano
+    KWARGS_LEYENDA = {"loc": "best"}   # posicion de la leyenda; cada graficador puede sobrescribirla
+
     def __init__(self, estilo: EsteticaSchema):
         self.estilo = estilo 
         self.props_tipograficas = aplicar_estilo(grid=True)
@@ -39,7 +42,7 @@ class BaseGrafico(ABC):
         if self.estilo.leyenda:
             handles, labels = ax.get_legend_handles_labels()
             if handles:
-                ax.legend(loc="best", prop=self.props_tipograficas["leyenda"])
+                ax.legend(prop=self.props_tipograficas["leyenda"], **self.KWARGS_LEYENDA)
 
     def _aplicar_marca_agua(self, fig: plt.Figure) -> None:
         """
@@ -50,7 +53,7 @@ class BaseGrafico(ABC):
             return  
             
         if "aplicar_marca_agua" in globals():
-            aplicar_marca_agua(fig, opcion=opcion_marca)
+            aplicar_marca_agua(fig, modo=opcion_marca)
         else:
             if opcion_marca == "malla":
                 marca_agua_malla(fig)
@@ -62,7 +65,7 @@ class BaseGrafico(ABC):
         El 'Template Method' controla el flujo exacto de dibujo.
         Garantiza que todas las salidas de la API sean idénticas en estructura de acuerdo a la identidad DIMAR.
         """
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(subplot_kw={"projection": self.PROYECCION})
         
         self.plot(ax, peticion)
 

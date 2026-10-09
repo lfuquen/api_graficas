@@ -5,15 +5,22 @@ from schemas.schemas import PeticionDispersion
 
 class DispersionGrafico(BaseGrafico):
 
+    # Ajustes esteticos propios de dispersion (configuracion sencilla, sin archivo exclusivo en utils/estilo)
+    ALPHA = 1
+    COLOR_BORDE = "#0086D6"
+
     def plot(self, ax: plt.Axes, peticion: PeticionDispersion) -> None:
+        """
+        Bloque de Dibujo: Implementa el BaseGrafico.
+        """
         var_x = peticion.variable_x
         var_y = peticion.variable_y
 
         ax.scatter(
             var_x.valores,
             var_y.valores,
-            alpha=0.8,
-            edgecolors="none"
+            alpha=self.ALPHA,
+            edgecolors=self.COLOR_BORDE
         )
 
         if not peticion.estetica.xlabel:
@@ -27,7 +34,7 @@ class DispersionGrafico(BaseGrafico):
 
 def dibujar(peticion: PeticionDispersion) -> str:
     """
-    Punto de entrada invocado por api/router.py
+    Enrutamiento a api/router.py
     """
     graficador = DispersionGrafico(estilo=peticion.estetica)
     return graficador.render(peticion)

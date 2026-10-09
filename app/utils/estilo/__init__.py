@@ -17,6 +17,20 @@ from .marca_agua import (
     marca_agua_malla,
     aplicar_marca_agua
 )
+from .estilo_barras import (
+    EstiloBarras,
+    kwargs_barra,
+    anotar_valores,
+    configurar_rejilla,
+    configurar_categorias
+)
+from .estilo_rosa_vientos import (
+    EstiloRosaVientos,
+    colores_por_intervalo,
+    etiquetas_intervalos,
+    configurar_ejes_polares,
+    anotar_pie
+)
 
 __all__ = [
     # Tipografia
@@ -36,5 +50,19 @@ __all__ = [
     "LOGO_PRINCIPAL",
     "marca_agua_localizada",
     "marca_agua_malla",
-    "aplicar_marca_agua"
+    "aplicar_marca_agua",
+
+    # Estilo de barras
+    "EstiloBarras",
+    "kwargs_barra",
+    "anotar_valores",
+    "configurar_rejilla",
+    "configurar_categorias",
+
+    # Estilo de rosa de vientos
+    "EstiloRosaVientos",
+    "colores_por_intervalo",
+    "etiquetas_intervalos",
+    "configurar_ejes_polares",
+    "anotar_pie"
 ]

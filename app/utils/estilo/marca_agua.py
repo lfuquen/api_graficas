@@ -105,4 +105,4 @@ def aplicar_marca_agua(
     if modo == "malla":
         marca_agua_malla(fig, logo_filename=logo_filename, **kwargs)
     else:
-        marca_agua_localizada(fig, logo_filename=logo_filename, **kwargs)
+        marca_agua_localizada(fig, logo_filename=logo_filename, modo=modo, **kwargs)

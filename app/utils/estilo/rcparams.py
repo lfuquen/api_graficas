@@ -66,6 +66,9 @@ def aplicar_estilo(
         "axes.grid": bool(grid)
     }
 
+    plt.rcParams.update(config_rc)
+    return tipografia
+
 def sincronizar_seaborn():
     """Sincroniza la paleta corporativa principal con Seaborn si está instalado."""
     try:

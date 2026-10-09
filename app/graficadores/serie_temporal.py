@@ -6,6 +6,10 @@ from schemas.schemas import PeticionSerieTemporal
 
 class SerieTemporalGrafico(BaseGrafico):
 
+    # Ajustes esteticos propios de serie temporal (configuracion sencilla, sin archivo exclusivo en utils/estilo)
+    GROSOR_LINEA = 1.5
+    ROTACION_FECHAS = 0
+
     def plot(self, ax: plt.Axes, peticion: PeticionSerieTemporal) -> None:
         """
         Bloque de Dibujo: Implementa el BaseGrafico.
@@ -22,15 +26,15 @@ class SerieTemporalGrafico(BaseGrafico):
                 fechas_dt, 
                 valores, 
                 label=nombre_variable,
-                linewidth=1.5,
+                linewidth=self.GROSOR_LINEA,
                 color=next(ciclo_colores)
             )
 
-        ax.tick_params(axis='x', rotation=45)
+        ax.tick_params(axis='x', rotation=self.ROTACION_FECHAS)
 
 def dibujar(peticion: PeticionSerieTemporal) -> str:
     """
-   Funcion de enrutamiento para main.py
+   Enrutamiento a api/router.py
     """
 
     graficador = SerieTemporalGrafico(estilo=peticion.estetica)    
