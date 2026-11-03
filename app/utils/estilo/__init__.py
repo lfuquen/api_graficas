@@ -27,9 +27,7 @@ from .estilo_barras import (
 from .estilo_rosa_vientos import (
     EstiloRosaVientos,
     colores_por_intervalo,
-    etiquetas_intervalos,
-    configurar_ejes_polares,
-    anotar_pie
+    configurar_ejes_polares
 )
 
 __all__ = [
@@ -62,7 +60,5 @@ __all__ = [
     # Estilo de rosa de vientos
     "EstiloRosaVientos",
     "colores_por_intervalo",
-    "etiquetas_intervalos",
-    "configurar_ejes_polares",
-    "anotar_pie"
+    "configurar_ejes_polares"
 ]

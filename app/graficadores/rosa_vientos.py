@@ -6,9 +6,7 @@ from schemas.schemas import PeticionRosaVientos, EsteticaSchema
 from utils.estilo import (
     EstiloRosaVientos,
     colores_por_intervalo,
-    etiquetas_intervalos,
-    configurar_ejes_polares,
-    anotar_pie
+    configurar_ejes_polares
 )
 
 N_INTERVALOS_AUTO = 5
@@ -35,7 +33,7 @@ def calcular_bordes(velocidades: np.ndarray, intervalos, umbral_calma: float) ->
 
 def calcular_frecuencias(direcciones, velocidades, n_sectores: int, bordes, umbral_calma: float):
     """
-    Matriz [sector x intervalo] en % del total y el % de calmas.
+    Matriz [sector x intervalo] en % del total (las calmas cuentan en el total).
     """
     total = len(velocidades)
     ancho = 360 / n_sectores
@@ -48,7 +46,16 @@ def calcular_frecuencias(direcciones, velocidades, n_sectores: int, bordes, umbr
     frecuencias = np.zeros((n_sectores, len(bordes)))
     np.add.at(frecuencias, (sectores[~calma], intervalos[~calma]), 1)
 
-    return frecuencias * 100 / total, calma.sum() * 100 / total
+    return frecuencias * 100 / total
+
+
+def etiquetas_intervalos(bordes, unidades: str) -> list:
+    """
+    '0.5–2 m/s', '2–4 m/s', ..., '≥8 m/s' (ultimo intervalo abierto).
+    """
+    etiquetas = [f"{a:g}–{b:g} {unidades}" for a, b in zip(bordes[:-1], bordes[1:])]
+    etiquetas.append(f"≥{bordes[-1]:g} {unidades}")
+    return etiquetas
 
 
 class RosaVientosGrafico(BaseGrafico):
@@ -72,7 +79,7 @@ class RosaVientosGrafico(BaseGrafico):
         velocidades = np.asarray(peticion.velocidades, dtype=float)
 
         bordes = calcular_bordes(velocidades, peticion.intervalos_velocidad, peticion.umbral_calma)
-        frecuencias, porcentaje_calmas = calcular_frecuencias(
+        frecuencias = calcular_frecuencias(
             direcciones, velocidades, n, bordes, peticion.umbral_calma
         )
 
@@ -88,7 +95,6 @@ class RosaVientosGrafico(BaseGrafico):
             acumulado += frecuencias[:, j]
 
         configurar_ejes_polares(ax, n)
-        anotar_pie(ax, porcentaje_calmas, estilo)
 
 
 def dibujar(peticion: PeticionRosaVientos) -> str:
