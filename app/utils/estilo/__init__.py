@@ -29,6 +29,12 @@ from .estilo_rosa_vientos import (
     colores_por_intervalo,
     configurar_ejes_polares
 )
+from .estilo_mapa_color import (
+    EstiloMapaColor,
+    mapa_colores,
+    normalizacion,
+    agregar_barra_color
+)
 
 __all__ = [
     # Tipografia
@@ -60,5 +66,11 @@ __all__ = [
     # Estilo de rosa de vientos
     "EstiloRosaVientos",
     "colores_por_intervalo",
-    "configurar_ejes_polares"
+    "configurar_ejes_polares",
+
+    # Estilo de mapa de color
+    "EstiloMapaColor",
+    "mapa_colores",
+    "normalizacion",
+    "agregar_barra_color"
 ]

@@ -1,8 +1,8 @@
 
 import logging
 from fastapi import APIRouter, HTTPException
-from schemas.schemas import PeticionSerieTemporal, PeticionDispersion, PeticionBarras, PeticionRosaVientos
-from graficadores import serie_temporal, dispersion, barras, rosa_vientos
+from schemas.schemas import PeticionSerieTemporal, PeticionDispersion, PeticionBarras, PeticionRosaVientos, PeticionMapaColor
+from graficadores import serie_temporal, dispersion, barras, rosa_vientos, mapa_color
 
 logger = logging.getLogger(__name__)
 
@@ -46,4 +46,13 @@ def ep_rosa_vientos(peticion: PeticionRosaVientos):
         return {"estado": "exito", "ruta_archivo": ruta}
     except Exception as e:
         logger.exception("Fallo al generar rosa_vientos")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/mapa_color")
+def ep_mapa_color(peticion: PeticionMapaColor):
+    try:
+        ruta = mapa_color.dibujar(peticion)
+        return {"estado": "exito", "ruta_archivo": ruta}
+    except Exception as e:
+        logger.exception("Fallo al generar mapa_color")
         raise HTTPException(status_code=500, detail=str(e))

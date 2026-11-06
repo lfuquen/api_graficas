@@ -15,7 +15,7 @@ class EstiloRosaVientos:
     Configuracion predeterminada institucional para rosas de vientos.
     Solo declara lo que difiere de la base de Matplotlib y de aplicar_estilo().
     """
-    mapa_colores: str = "viridis"
+    mapa_colores: str = "cmo.thermal"
 
 
 def colores_por_intervalo(n_intervalos: int, estilo: EstiloRosaVientos) -> list:

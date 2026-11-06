@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import cmocean  # registra los mapas "cmo.*" en Matplotlib; no modifica rcParams
 from .fuentes import registrar_fuentes, roles_tipograficos, FUENTE_PREDETERMINADA
 
 # Valores pedeterminados institucionales

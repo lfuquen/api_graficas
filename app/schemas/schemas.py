@@ -131,3 +131,32 @@ class PeticionRosaVientos(BaseModel):
             if any(b <= a for a, b in zip(self.intervalos_velocidad, self.intervalos_velocidad[1:])):
                 raise ValueError("'intervalos_velocidad' debe ser estrictamente creciente")
         return self
+
+class PeticionMapaColor(BaseModel):
+    x: List[float]
+    y: List[float]
+    z: List[List[Optional[float]]]   # filas = len(y), columnas = len(x); None = sin dato
+    unidades: str = ""
+    tipo: Literal["celdas", "contorno"] = "celdas"
+    divergente: bool = False
+    vmin: Optional[float] = None
+    vmax: Optional[float] = None
+    niveles: Optional[int] = Field(default=None, ge=2)   # solo modo contorno; None = valor del estilo
+    estetica: EsteticaSchema
+
+    @model_validator(mode="after")
+    def validar_malla(self):
+        if not self.x or not self.y:
+            raise ValueError("'x' e 'y' deben contener al menos un valor")
+        if len(self.z) != len(self.y):
+            raise ValueError(f"'z' tiene {len(self.z)} filas; se esperaban {len(self.y)} (una por valor de 'y')")
+        for i, fila in enumerate(self.z):
+            if len(fila) != len(self.x):
+                raise ValueError(f"La fila {i} de 'z' tiene {len(fila)} valores; se esperaban {len(self.x)} (uno por valor de 'x')")
+        if all(v is None for fila in self.z for v in fila):
+            raise ValueError("'z' no contiene ningun valor valido")
+        if self.tipo == "contorno" and (len(self.x) < 2 or len(self.y) < 2):
+            raise ValueError("El modo 'contorno' requiere al menos 2 valores en 'x' y en 'y'")
+        if self.vmin is not None and self.vmax is not None and self.vmin >= self.vmax:
+            raise ValueError("'vmin' debe ser menor que 'vmax'")
+        return self
