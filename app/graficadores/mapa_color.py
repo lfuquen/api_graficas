@@ -4,13 +4,17 @@ from graficadores.base_grafica import BaseGrafico
 from schemas.schemas import PeticionMapaColor, EsteticaSchema
 from utils.estilo import (
     EstiloMapaColor,
+    CRS_DATOS,
     mapa_colores,
     normalizacion,
-    agregar_barra_color
+    agregar_barra_color,
+    configurar_mapa_base
 )
 
 
 class MapaColorGrafico(BaseGrafico):
+
+    PROYECCION = CRS_DATOS   # GeoAxes de Cartopy; solo este graficador, BaseGrafico no cambia
 
     def __init__(self, estilo: EsteticaSchema):
         super().__init__(estilo)
@@ -31,14 +35,17 @@ class MapaColorGrafico(BaseGrafico):
         norm = normalizacion(z, peticion.vmin, peticion.vmax, peticion.divergente)
 
         if peticion.tipo == "contorno":
-            malla = ax.contourf(x, y, z, levels=peticion.niveles or estilo.niveles, cmap=cmap, norm=norm)
+            malla = ax.contourf(x, y, z, levels=peticion.niveles or estilo.niveles,
+                                cmap=cmap, norm=norm, transform=CRS_DATOS)
             if estilo.lineas_contorno:
                 ax.contour(x, y, z, levels=malla.levels, colors=estilo.color_contorno,
-                           linewidths=estilo.grosor_contorno, alpha=estilo.alpha_contorno)
+                           linewidths=estilo.grosor_contorno, alpha=estilo.alpha_contorno,
+                           transform=CRS_DATOS)
         else:
-            malla = ax.pcolormesh(x, y, z, cmap=cmap, norm=norm, shading="auto")
+            malla = ax.pcolormesh(x, y, z, cmap=cmap, norm=norm, shading="auto", transform=CRS_DATOS)
 
-        ax.grid(False)   # la rejilla global se superpone a las celdas
+        configurar_mapa_base(ax, x, y, estilo, self.props_tipograficas["etiquetas"],
+                             media_celda=peticion.tipo == "celdas")
         agregar_barra_color(ax, malla, peticion.unidades, self.props_tipograficas["etiquetas"])
 
 

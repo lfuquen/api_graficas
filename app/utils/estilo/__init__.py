@@ -31,9 +31,11 @@ from .estilo_rosa_vientos import (
 )
 from .estilo_mapa_color import (
     EstiloMapaColor,
+    CRS_DATOS,
     mapa_colores,
     normalizacion,
-    agregar_barra_color
+    agregar_barra_color,
+    configurar_mapa_base
 )
 
 __all__ = [
@@ -70,7 +72,9 @@ __all__ = [
 
     # Estilo de mapa de color
     "EstiloMapaColor",
+    "CRS_DATOS",
     "mapa_colores",
     "normalizacion",
-    "agregar_barra_color"
+    "agregar_barra_color",
+    "configurar_mapa_base"
 ]
