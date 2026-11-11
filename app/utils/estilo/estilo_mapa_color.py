@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from functools import lru_cache
 import numpy as np
@@ -18,6 +19,11 @@ cartopy.config["pre_existing_data_dir"] = str(settings.RUTA_CARTOPY)
 
 CRS_DATOS = ccrs.PlateCarree()   # x, y de la peticion en grados: longitud [-180, 180], latitud
 
+# Region cubierta por las capas de static/cartopy (debe coincidir con CAJA en recortar_shapefiles.py)
+REGION_MAPA_BASE = (-86.0, -65.0, -5.0, 17.0)   # lon_min, lon_max, lat_min, lat_max
+
+logger = logging.getLogger(__name__)
+
 
 @dataclass(frozen=True)
 class EstiloMapaColor:
@@ -25,10 +31,10 @@ class EstiloMapaColor:
     Configuracion predeterminada institucional para mapas de color.
     Solo declara lo que difiere de la base de Matplotlib y de aplicar_estilo().
     """
-    mapa_secuencial: str = "cmo.thermal"
+    mapa_secuencial: str = "turbo"
     mapa_divergente: str = "cmo.balance"
     niveles: int = 12                 # niveles por defecto en modo contorno
-    lineas_contorno: bool = True
+    lineas_contorno: bool = False
     color_contorno: str = "k"
     grosor_contorno: float = 0.4
     alpha_contorno: float = 0.5
@@ -131,6 +137,11 @@ def configurar_mapa_base(ax: plt.Axes, x: np.ndarray, y: np.ndarray,
     """
     extension = [*_limites(x, media_celda), *_limites(y, media_celda)]
     ax.set_extent(extension, crs=CRS_DATOS)
+
+    lon0, lon1, lat0, lat1 = REGION_MAPA_BASE
+    if extension[0] < lon0 or extension[1] > lon1 or extension[2] < lat0 or extension[3] > lat1:
+        logger.warning("Mapa %s fuera de la region del mapa base %s: esa parte se dibuja sin tierra ni costa",
+                       [round(float(v), 2) for v in extension], REGION_MAPA_BASE)
 
     tierra, costa = _capas_costa(extension, estilo)
     # Borde del mismo color que el relleno: oculta las uniones entre cuadriculas de la costa de alta resolucion

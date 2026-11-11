@@ -39,7 +39,8 @@ Todas las capas están recortadas a la extensión terrestre y marítima de Colom
 
 Incluye Colombia continental, San Andrés y Providencia, Serranilla, Bajo Nuevo, Malpelo y las aguas del
 Caribe y del Pacífico. Una gráfica con coordenadas fuera de esta región se dibuja sin tierra ni costa en
-la parte que queda por fuera.
+la parte que queda por fuera, y se registra una advertencia en el log. La región está declarada también
+en `REGION_MAPA_BASE` (`utils/estilo/estilo_mapa_color.py`); si se modifica `CAJA`, actualizarla.
 
 ## Regenerar o ampliar la región
 

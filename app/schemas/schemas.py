@@ -132,9 +132,14 @@ class PeticionRosaVientos(BaseModel):
                 raise ValueError("'intervalos_velocidad' debe ser estrictamente creciente")
         return self
 
+# Grados decimales; inf/NaN no se aceptan como coordenada
+Longitud = Annotated[float, Field(ge=-180, le=180, allow_inf_nan=False)]
+Latitud = Annotated[float, Field(ge=-90, le=90, allow_inf_nan=False)]
+
+
 class PeticionMapaColor(BaseModel):
-    x: List[float]
-    y: List[float]
+    x: List[Longitud]
+    y: List[Latitud]
     z: List[List[Optional[float]]]   # filas = len(y), columnas = len(x); None = sin dato
     unidades: str = ""
     tipo: Literal["celdas", "contorno"] = "celdas"
@@ -148,6 +153,10 @@ class PeticionMapaColor(BaseModel):
     def validar_malla(self):
         if len(self.x) < 2 or len(self.y) < 2:
             raise ValueError("'x' e 'y' deben tener al menos 2 valores")
+        for nombre, valores in (("x", self.x), ("y", self.y)):
+            pasos = [b - a for a, b in zip(valores, valores[1:])]
+            if not (all(p > 0 for p in pasos) or all(p < 0 for p in pasos)):
+                raise ValueError(f"'{nombre}' debe ser estrictamente creciente o decreciente, sin valores repetidos")
         if len(self.z) != len(self.y):
             raise ValueError(f"'z' tiene {len(self.z)} filas; se esperaban {len(self.y)} (una por valor de 'y')")
         for i, fila in enumerate(self.z):
