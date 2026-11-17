@@ -32,7 +32,7 @@ class DispersionGrafico(BaseGrafico):
             ax.set_ylabel(label_y, fontproperties=self.props_tipograficas["etiquetas"])
 
 
-def dibujar(peticion: PeticionDispersion) -> str:
+def dibujar(peticion: PeticionDispersion) -> bytes:
     """
     Enrutamiento a api/router.py
     """

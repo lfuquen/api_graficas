@@ -100,11 +100,19 @@ def _limites(valores: np.ndarray, media_celda: bool) -> tuple:
 @lru_cache(maxsize=None)
 def _capa_alta_resolucion(nombre: str) -> tuple:
     """
-    Carga una sola vez (primera grafica que la necesite) las cuadriculas de la capa y su indice espacial.
+    Carga una sola vez (al iniciar, desde precargar_capas) las cuadriculas de la capa y su indice espacial.
     """
     lector = shapefile.Reader(str(settings.RUTA_COSTA_ALTA / nombre))
     geometrias = [shape(s.__geo_interface__) for s in lector.iterShapes()]
     return geometrias, STRtree(geometrias)
+
+
+def precargar_capas() -> None:
+    """
+    Carga la costa de alta resolucion al iniciar cada worker, no con la primera peticion.
+    """
+    for nombre in ("tierra", "costa"):
+        _capa_alta_resolucion(nombre)
 
 
 def _geometrias_alta_resolucion(nombre: str, extension: list) -> list:

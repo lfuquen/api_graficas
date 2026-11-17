@@ -58,7 +58,7 @@ class BarrasGrafico(BaseGrafico):
         configurar_categorias(ax, posiciones, categorias, horizontal, estilo)
 
 
-def dibujar(peticion: PeticionBarras) -> str:
+def dibujar(peticion: PeticionBarras) -> bytes:
     """
     Enrutamiento a api/router.py
     """

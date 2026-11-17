@@ -1,6 +1,7 @@
 
 import logging
-from fastapi import APIRouter, HTTPException
+from threading import Lock
+from fastapi import APIRouter, HTTPException, Response
 from schemas.schemas import PeticionSerieTemporal, PeticionDispersion, PeticionBarras, PeticionRosaVientos, PeticionMapaColor
 from graficadores import serie_temporal, dispersion, barras, rosa_vientos, mapa_color
 
@@ -8,51 +9,41 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/graficos", tags=["Graficadores Modulares"])
 
-@router.post("/serie_temporal")
+# pyplot y rcParams son globales: una grafica a la vez por proceso (aplicar_estilo corre en el constructor)
+LOCK_GRAFICOS = Lock()
+RESPUESTA_PNG = {200: {"content": {"image/png": {}}}}
+
+
+def _responder_png(graficador, peticion, nombre: str) -> Response:
+    try:
+        with LOCK_GRAFICOS:
+            png = graficador.dibujar(peticion)
+    except Exception:
+        logger.exception("Fallo al generar %s", nombre)
+        raise HTTPException(status_code=500, detail=f"No se pudo generar la grafica {nombre}")
+    return Response(
+        content=png,
+        media_type="image/png",
+        headers={"Content-Disposition": f'inline; filename="{nombre}.png"'},
+    )
+
+
+@router.post("/serie_temporal", response_class=Response, responses=RESPUESTA_PNG)
 def ep_serie_temporal(peticion: PeticionSerieTemporal):
-    print (peticion)
-    try:
-        ruta = serie_temporal.dibujar(peticion)
-        print ("ruta", ruta)
+    return _responder_png(serie_temporal, peticion, "serie_temporal")
 
-        return {"estado": "exito", "ruta_archivo": ruta}
-    except Exception as e:
-        logger.exception("Fallo al generar serie_temporal")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.post("/dispersion")
+@router.post("/dispersion", response_class=Response, responses=RESPUESTA_PNG)
 def ep_dispersion(peticion: PeticionDispersion):
-    print (peticion)
-    try:
-        ruta = dispersion.dibujar(peticion)
-        return {"estado": "exito", "ruta_archivo": ruta}
-    except Exception as e:
-        logger.exception("Fallo al generar dispersion")
-        raise HTTPException(status_code=500, detail=str(e))
+    return _responder_png(dispersion, peticion, "dispersion")
 
-@router.post("/barras")
+@router.post("/barras", response_class=Response, responses=RESPUESTA_PNG)
 def ep_barras(peticion: PeticionBarras):
-    try:
-        ruta = barras.dibujar(peticion)
-        return {"estado": "exito", "ruta_archivo": ruta}
-    except Exception as e:
-        logger.exception("Fallo al generar barras")
-        raise HTTPException(status_code=500, detail=str(e))
+    return _responder_png(barras, peticion, "barras")
 
-@router.post("/rosa_vientos")
+@router.post("/rosa_vientos", response_class=Response, responses=RESPUESTA_PNG)
 def ep_rosa_vientos(peticion: PeticionRosaVientos):
-    try:
-        ruta = rosa_vientos.dibujar(peticion)
-        return {"estado": "exito", "ruta_archivo": ruta}
-    except Exception as e:
-        logger.exception("Fallo al generar rosa_vientos")
-        raise HTTPException(status_code=500, detail=str(e))
+    return _responder_png(rosa_vientos, peticion, "rosa_vientos")
 
-@router.post("/mapa_color")
+@router.post("/mapa_color", response_class=Response, responses=RESPUESTA_PNG)
 def ep_mapa_color(peticion: PeticionMapaColor):
-    try:
-        ruta = mapa_color.dibujar(peticion)
-        return {"estado": "exito", "ruta_archivo": ruta}
-    except Exception as e:
-        logger.exception("Fallo al generar mapa_color")
-        raise HTTPException(status_code=500, detail=str(e))
+    return _responder_png(mapa_color, peticion, "mapa_color")

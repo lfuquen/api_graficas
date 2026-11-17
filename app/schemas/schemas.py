@@ -23,7 +23,6 @@ TipoMarcaAgua = Union[
 Desificiones estetica
 """
 class EsteticaSchema(BaseModel):
-    nombre_archivo_salida: str = "salida.png"
     titulo: Optional[str] = ""
     xlabel: Optional[str] = ""
     ylabel: Optional[str] = ""

@@ -20,7 +20,8 @@ uvicorn app.main:app --reload
 
 ## Tener en cuenta cada vez
 
-- Lanzar siempre desde `api_graficas`: de ahi dependen encontrar `app.main` y la ubicacion de las imagenes generadas (quedan en `api_graficas/salidas/`).
+- Lanzar siempre desde `api_graficas`: de ahi depende encontrar `app.main`.
+- Los endpoints de graficos responden directamente con la imagen PNG (`Content-Type: image/png`); la API no guarda archivos en disco.
 - El entorno del proyecto es `graficador_env`. Si cambia de nombre o ubicacion, actualizar la ruta en `run_server-dev.sh`.
 - Si falta una libreria, con el entorno activo: `pip install -r requirements.txt`
 - Por defecto la API queda en http://127.0.0.1:8000 y la documentacion en `/docs`.

@@ -32,7 +32,7 @@ class SerieTemporalGrafico(BaseGrafico):
 
         ax.tick_params(axis='x', rotation=self.ROTACION_FECHAS)
 
-def dibujar(peticion: PeticionSerieTemporal) -> str:
+def dibujar(peticion: PeticionSerieTemporal) -> bytes:
     """
    Enrutamiento a api/router.py
     """

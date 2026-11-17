@@ -25,8 +25,8 @@ defecto):
 | Menor que 5°        | Costa de alta resolución DIMAR/CIOH (detalle de puerto: muelles, escolleras, tajamares) |
 | 5° o más            | Natural Earth 10m |
 
-La costa de alta resolución se carga en memoria con la primera gráfica que la necesita; después solo se
-leen las cuadrículas que tocan el mapa.
+La costa de alta resolución se carga en memoria al iniciar la API, una vez por worker (`precargar_capas`
+en `utils/estilo/estilo_mapa_color.py`); cada gráfica solo lee las cuadrículas que tocan el mapa.
 
 ## Región
 

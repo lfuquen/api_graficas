@@ -49,7 +49,7 @@ class MapaColorGrafico(BaseGrafico):
         agregar_barra_color(ax, malla, peticion.unidades, self.props_tipograficas["etiquetas"])
 
 
-def dibujar(peticion: PeticionMapaColor) -> str:
+def dibujar(peticion: PeticionMapaColor) -> bytes:
     """
     Enrutamiento a api/router.py
     """

@@ -97,7 +97,7 @@ class RosaVientosGrafico(BaseGrafico):
         configurar_ejes_polares(ax, n)
 
 
-def dibujar(peticion: PeticionRosaVientos) -> str:
+def dibujar(peticion: PeticionRosaVientos) -> bytes:
     """
     Enrutamiento a api/router.py
     """

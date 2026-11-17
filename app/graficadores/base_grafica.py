@@ -1,4 +1,4 @@
-import os
+from io import BytesIO
 from abc import ABC, abstractmethod
 import matplotlib.pyplot as plt
 from schemas.schemas import EsteticaSchema
@@ -60,24 +60,24 @@ class BaseGrafico(ABC):
             else:
                 marca_agua_localizada(fig, modo=opcion_marca)
 
-    def render(self, peticion) -> str:
+    def render(self, peticion) -> bytes:
         """
         El 'Template Method' controla el flujo exacto de dibujo.
         Garantiza que todas las salidas de la API sean idénticas en estructura de acuerdo a la identidad DIMAR.
+        Retorna el PNG en memoria; la figura se cierra aunque el dibujo falle.
         """
         fig, ax = plt.subplots(subplot_kw={"projection": self.PROYECCION})
-        
-        self.plot(ax, peticion)
+        try:
+            self.plot(ax, peticion)
 
-        self.configurar_ejes(ax)
+            self.configurar_ejes(ax)
 
-        fig.tight_layout()
-        
-        self._aplicar_marca_agua(fig)
-        
-        os.makedirs("salidas", exist_ok=True)
-        ruta_salida = f"salidas/{self.estilo.nombre_archivo_salida}"
-        fig.savefig(ruta_salida)
-        plt.close(fig)
+            fig.tight_layout()
 
-        return ruta_salida
+            self._aplicar_marca_agua(fig)
+
+            buffer = BytesIO()
+            fig.savefig(buffer, format="png")
+            return buffer.getvalue()
+        finally:
+            plt.close(fig)
